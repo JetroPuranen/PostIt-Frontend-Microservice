@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>e3f3d7fa-186a-4e90-9f66-5b18547669c4</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,11 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PostIt.Application\PostIt.Application.csproj" />
+    <ProjectReference Include="..\PostIt.Infrastructure\PostIt.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
