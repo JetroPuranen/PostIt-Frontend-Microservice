@@ -1,7 +1,5 @@
-﻿using System.Threading.Tasks;
-using PostIt.Domain.Interfaces;
-using PostIt.Application.Dto;
-using PostIt.Domain.Data;
+﻿using PostIt.Domain.Interfaces;
+using PostIt.Application.Interfaces;
 
 namespace PostIt.Application.Services
 {
@@ -9,18 +7,28 @@ namespace PostIt.Application.Services
     {
         private readonly IPasswordHasher _passwordHasher;
         private readonly IUserRepository _userRepository;
+        private readonly IJwtTokenService _jwtTokenService; 
 
-        public LoginService(IPasswordHasher passwordHasher, IUserRepository userRepository)
+        public LoginService(IPasswordHasher passwordHasher, IUserRepository userRepository, IJwtTokenService jwtTokenService)
         {
             _passwordHasher = passwordHasher;
             _userRepository = userRepository;
+            _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<bool> LoginUserAsync(string username, string password)
+        public async Task<string> LoginUserAsync(string username, string password)
         {
-            
             var hashedPassword = _passwordHasher.HashPassword(password);
-            return await _userRepository.LoginUserInDatabase(username, hashedPassword);
+            var loginSuccess = await _userRepository.LoginUserInDatabase(username, hashedPassword);
+
+            if (loginSuccess)
+            {
+                
+                return _jwtTokenService.GenerateToken(username);
+            }
+
+            
+            return null;
         }
     }
 }
