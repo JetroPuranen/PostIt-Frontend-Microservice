@@ -19,7 +19,7 @@ namespace PostIt.FrontEndMicroService.Controllers
         }
 
         [HttpPost("addUser")]
-        [AllowAnonymous]
+        
         public async Task<IActionResult> AddUser([FromForm] CreateUserDto createUserDto, IFormFile profilePicture)
         {
             if (createUserDto == null)
@@ -59,11 +59,11 @@ namespace PostIt.FrontEndMicroService.Controllers
                 return BadRequest("Invalid login data.");
             }
 
-            var loginResult = await _loginService.LoginUserAsync(loginDto.Username, loginDto.Password);
+            var token = await _loginService.LoginUserAsync(loginDto.Username, loginDto.Password);
 
-            if (loginResult)
+            if (token != null)
             {
-                return Ok("Login successful.");
+                return Ok(new { Token = token });
             }
 
             return Unauthorized("Invalid username or password.");
