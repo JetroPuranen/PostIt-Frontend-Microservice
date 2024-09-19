@@ -27,7 +27,7 @@ namespace PostIt.Application.Services
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            // Create the token
+            
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
@@ -36,7 +36,7 @@ namespace PostIt.Application.Services
                 signingCredentials: credentials
             );
 
-            // Return the generated token
+            
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
