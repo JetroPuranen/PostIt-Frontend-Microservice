@@ -72,7 +72,7 @@ namespace PostIt.FrontEndMicroService.Controllers
                 return BadRequest("Invalid login data.");
             }
 
-            var (token, userId) = await _loginService.LoginUserAsync(loginDto.Username, loginDto.Password);
+            var (token, userId) = await _loginService.LoginUserAsync(loginDto);
 
             if (token != null && userId != null)
             {

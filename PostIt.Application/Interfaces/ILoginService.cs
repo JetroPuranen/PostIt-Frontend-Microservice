@@ -1,4 +1,6 @@
-﻿public interface ILoginService
+﻿using PostIt.Application.Dto;
+
+public interface ILoginService
 {
-    Task<(string Token, string UserId)> LoginUserAsync(string username, string password);
+    Task<(string Token, string UserId)> LoginUserAsync(LoginDto loginDto); 
 }
