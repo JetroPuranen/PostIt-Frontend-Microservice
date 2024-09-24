@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PostIt.Application.Dto;
 using PostIt.Application.Interfaces;
-using PostIt.Application.Services;
+
 
 namespace PostIt.FrontEndMicroService.Controllers
 {
@@ -12,14 +12,26 @@ namespace PostIt.FrontEndMicroService.Controllers
     {
         private readonly IUserService _userService;
         private readonly ILoginService _loginService;
-        public FrontEndController(IUserService userService, ILoginService loginService)
+        private readonly IFollowerService _followerService;
+        private readonly IUnfollowService _unfollowService;
+        private readonly IConfiguration _configuration;
+
+        public FrontEndController(
+            IUserService userService,
+            ILoginService loginService,
+            IFollowerService followerService,
+            IUnfollowService unfollowService,
+            IConfiguration configuration)
         {
             _userService = userService;
             _loginService = loginService;
+            _followerService = followerService;
+            _unfollowService = unfollowService;
+            _configuration = configuration;
         }
 
         [HttpPost("addUser")]
-        
+        [AllowAnonymous]
         public async Task<IActionResult> AddUser([FromForm] CreateUserDto createUserDto, IFormFile profilePicture)
         {
             if (createUserDto == null)
@@ -32,7 +44,7 @@ namespace PostIt.FrontEndMicroService.Controllers
                 using (var memoryStream = new MemoryStream())
                 {
                     await profilePicture.CopyToAsync(memoryStream);
-                    createUserDto.ProfilePicture = Convert.ToBase64String(memoryStream.ToArray()); 
+                    createUserDto.ProfilePicture = Convert.ToBase64String(memoryStream.ToArray());
                 }
             }
 
@@ -50,6 +62,7 @@ namespace PostIt.FrontEndMicroService.Controllers
 
             return StatusCode(500, "An error occurred while creating the user.");
         }
+
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> LoginUser([FromForm] LoginDto loginDto)
@@ -59,16 +72,51 @@ namespace PostIt.FrontEndMicroService.Controllers
                 return BadRequest("Invalid login data.");
             }
 
-            var token = await _loginService.LoginUserAsync(loginDto.Username, loginDto.Password);
+            var (token, userId) = await _loginService.LoginUserAsync(loginDto.Username, loginDto.Password);
 
-            if (token != null)
+            if (token != null && userId != null)
             {
-                return Ok(new { Token = token });
+                return Ok(new { Token = token, UserId = userId });
             }
 
             return Unauthorized("Invalid username or password.");
         }
+
+        [HttpPost("addFollower")]
+        [Authorize]
+        public async Task<IActionResult> AddFollower([FromForm] FollowerDto followerDto)
+        {
+            if (followerDto == null)
+            {
+                return BadRequest("Follower data is null.");
+            }
+
+
+            var result = await _followerService.AddFollowerAsync(followerDto);
+            if (result)
+            {
+                return Ok("Follower added successfully.");
+            }
+
+            return StatusCode(500, "An error occurred while adding the follower.");
+        }
+
+        [HttpPost("unfollowUser")]
+        [Authorize]
+        public async Task<IActionResult> UnfollowUser([FromForm] UnfollowDto unfollowDto)
+        {
+            if (unfollowDto == null)
+            {
+                return BadRequest("Unfollow data is null.");
+            }
+
+            var result = await _unfollowService.RemoveFollowerAsync(unfollowDto);
+            if (result)
+            {
+                return Ok("Unfollowed user successfully.");
+            }
+
+            return StatusCode(500, "An error occurred while unfollowing the user.");
+        }
     }
-
 }
-

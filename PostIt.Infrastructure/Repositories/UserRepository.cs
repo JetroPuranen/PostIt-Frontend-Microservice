@@ -1,9 +1,8 @@
 ﻿using PostIt.Domain.Data;
-using PostIt.Domain.Interfaces;
 using System.Text;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
-
+using PostIt.Domain.Interfaces;
 
 namespace PostIt.Infrastructure.Repositories
 {
@@ -26,7 +25,7 @@ namespace PostIt.Infrastructure.Repositories
             var response = await _httpClient.PostAsync(_dbUrl, content); 
             return response.IsSuccessStatusCode;
         }
-        public async Task<bool> LoginUserInDatabase(string username, string hashedPassword)
+        public async Task<string> LoginUserInDatabase(string username, string hashedPassword)
         {
             var loginData = new
             {
@@ -36,9 +35,38 @@ namespace PostIt.Infrastructure.Repositories
 
             var jsonData = JsonConvert.SerializeObject(loginData);
             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            var loginurl = "https://localhost:7035/api/Database/login";
+            var loginurl = _dbUrl + "login";
             var response = await _httpClient.PostAsync(loginurl, content);
+            var responseContent = await response.Content.ReadAsStringAsync(); 
+
+            Console.WriteLine(responseContent); 
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseObject = JsonConvert.DeserializeObject<Users>(responseContent);
+                return responseObject?.UserId; 
+            }
+
+            return null; 
+        }
+
+        public async Task<bool> AddFollowerToDatabase(FollowerData follower)
+        {
+           
+            var jsonData = JsonConvert.SerializeObject(follower);
+            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync($"{_dbUrl}addFollower", content);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> RemoveFollowerFromDatabase(UnfollowData unfollowDto)
+        {
+            var jsonData = JsonConvert.SerializeObject(unfollowDto);
+            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync($"{_dbUrl}unfollowUser", content);
             return response.IsSuccessStatusCode;
         }
     }
+    
 }
