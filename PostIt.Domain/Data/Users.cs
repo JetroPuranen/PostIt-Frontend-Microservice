@@ -4,6 +4,7 @@ namespace PostIt.Domain.Data
 {
     public class Users
     {
+        public string? UserId { get; set; }
         public string? Username { get; set; }
         public string? Password { get; set; } 
         public string? FirstName { get; set; }
@@ -18,7 +19,8 @@ namespace PostIt.Domain.Data
         public virtual ICollection<Users> Followers { get; set; } = new List<Users>();
         public virtual ICollection<Users> Following { get; set; } = new List<Users>();
         
-
+        
+  
        
         public Users ToEntity()
         {
