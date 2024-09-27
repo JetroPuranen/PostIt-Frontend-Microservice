@@ -14,13 +14,14 @@ namespace PostIt.FrontEndMicroService.Controllers
         private readonly ILoginService _loginService;
         private readonly IFollowerService _followerService;
         private readonly IUnfollowService _unfollowService;
+        private readonly IPostService _postService;
         private readonly IConfiguration _configuration;
-
+        
         public FrontEndController(
             IUserService userService,
             ILoginService loginService,
             IFollowerService followerService,
-            IUnfollowService unfollowService,
+            IUnfollowService unfollowService, IPostService postService,
             IConfiguration configuration)
         {
             _userService = userService;
@@ -28,6 +29,7 @@ namespace PostIt.FrontEndMicroService.Controllers
             _followerService = followerService;
             _unfollowService = unfollowService;
             _configuration = configuration;
+            _postService = postService;
         }
 
         [HttpPost("addUser")]
@@ -39,14 +41,6 @@ namespace PostIt.FrontEndMicroService.Controllers
                 return BadRequest("User data is null.");
             }
 
-            if (profilePicture != null)
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await profilePicture.CopyToAsync(memoryStream);
-                    createUserDto.ProfilePicture = Convert.ToBase64String(memoryStream.ToArray());
-                }
-            }
 
             var validationResult = _userService.ValidateUser(createUserDto);
             if (!validationResult.IsValid)
@@ -54,7 +48,7 @@ namespace PostIt.FrontEndMicroService.Controllers
                 return BadRequest(validationResult.Message);
             }
 
-            var result = await _userService.AddUserAsync(createUserDto);
+            var result = await _userService.AddUserAsync(createUserDto, profilePicture);
             if (result)
             {
                 return Ok("User created and sent to database successfully.");
@@ -118,5 +112,17 @@ namespace PostIt.FrontEndMicroService.Controllers
 
             return StatusCode(500, "An error occurred while unfollowing the user.");
         }
+        [HttpPost("addPost")]
+        public async Task<IActionResult> AddPost([FromForm] PostDto postDto, IFormFile postPicture)
+        {
+            if (postDto == null)
+            {
+                return BadRequest("Post data is null.");
+            }
+
+            await _postService.AddPostAsync(postDto, postPicture);
+            return Ok("Post created successfully.");
+        }
     }
 }
+

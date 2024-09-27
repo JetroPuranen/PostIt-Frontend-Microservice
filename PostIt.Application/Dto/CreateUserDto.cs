@@ -9,6 +9,5 @@
         public string? EmailAddress { get; set; }
         public string? HomeAddress { get; set; }
         public DateTime BirthDay { get; set; }
-        public string? ProfilePicture { get; set; }
     }
 }

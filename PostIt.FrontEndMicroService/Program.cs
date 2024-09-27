@@ -36,6 +36,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "PostIt API", Version = "v1" });
+    
 
 });
 
@@ -49,6 +50,9 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddScoped<IFollowerService, FollowerService>();
 builder.Services.AddScoped<IUnfollowService, UnfollowService>();
+
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IPostsRepository, PostsRepository>();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
