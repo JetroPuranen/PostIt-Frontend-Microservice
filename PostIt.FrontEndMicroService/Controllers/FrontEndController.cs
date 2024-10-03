@@ -123,6 +123,67 @@ namespace PostIt.FrontEndMicroService.Controllers
             await _postService.AddPostAsync(postDto, postPicture);
             return Ok("Post created successfully.");
         }
+        [HttpGet("getpost/{id}")]
+        public async Task<IActionResult> GetPostById(Guid id)
+        {
+            if(id == null)
+            {
+                return BadRequest("Id is null");
+            }
+            var post = await _postService.GetPostByIdAsync(id);
+            return Ok(post);
+        }
+        [HttpGet("getUser/{id}")]
+        public async Task<IActionResult> GetUserById(Guid id)
+        {
+            if (id == null)
+            {
+                return BadRequest("Id is null");
+            }
+
+            var user = await _userService.GetUserById(id);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Check if the profile picture exists
+            string profilePictureUrl = null;
+            if (user.ProfilePictureBytes != null)
+            {
+                // Convert the profile picture to a downloadable file URL (assuming this endpoint serves it)
+                profilePictureUrl = Url.Action(nameof(DownloadProfilePicture), new { id = id });
+            }
+
+            // Return JSON data along with the picture URL
+            return Ok(new
+            {
+                user.UserId,
+                user.Username,
+                user.FirstName,
+                user.SurName,
+                user.EmailAddress,
+                user.HomeAddress,
+                user.BirthDay,
+                ProfilePictureUrl = profilePictureUrl // Include the picture URL
+            });
+        }
+
+        [HttpGet("downloadProfilePicture/{id}")]
+        public async Task<IActionResult> DownloadProfilePicture(Guid id)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null || user.ProfilePictureBytes == null)
+            {
+                return NotFound("User or profile picture not found");
+            }
+
+            // Return the profile picture as a file download
+            return new FileContentResult(user.ProfilePictureBytes, "image/jpeg")
+            {
+                FileDownloadName = $"{user.Username}_profile.jpg"
+            };
+        }
     }
 }
 
