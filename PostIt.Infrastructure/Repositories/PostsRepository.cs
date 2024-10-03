@@ -24,5 +24,19 @@ namespace PostIt.Infrastructure.Repositories
             var response = await _httpClient.PostAsync(_dbUrl + "addPost", content);
             
         }
+
+        public async Task<Posts> GetAsync(Guid id)
+        {
+            var response = await _httpClient.GetAsync(_dbUrl + "getPost/" + id);
+
+            // Ensure the response is successful
+            response.EnsureSuccessStatusCode();
+
+            // Read and deserialize the response content
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var post = JsonConvert.DeserializeObject<Posts>(jsonResponse);
+
+            return post;
+        }
     }
 }

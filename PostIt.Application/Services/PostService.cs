@@ -47,5 +47,23 @@ namespace PostIt.Application.Services
 
             await _postsRepository.AddAsync(post);
         }
+
+        public async Task<PostDto> GetPostByIdAsync(Guid id)
+        {
+            var post = await _postsRepository.GetAsync(id);
+
+            
+            var postDto = new PostDto
+            {
+                
+                Caption = post.Caption,
+                Comments = post.Comments,
+                LikeCount = post.LikeCount,
+                WhoHasLiked = post.WhoHasLiked,
+                ImageData = post.ImageData,
+            };
+
+            return postDto;
+        }
     }
 }
