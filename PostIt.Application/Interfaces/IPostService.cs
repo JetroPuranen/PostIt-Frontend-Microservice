@@ -8,5 +8,6 @@ namespace PostIt.Application.Interfaces
     {
         Task AddPostAsync(PostDto postDto, IFormFile image);
         Task<PostDto> GetPostByIdAsync(Guid id);
+        Task<List<PostDto>> GetPostsByUserIdAsync(Guid userId);
     }
 }
