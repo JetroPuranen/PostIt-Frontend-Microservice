@@ -184,6 +184,35 @@ namespace PostIt.FrontEndMicroService.Controllers
                 FileDownloadName = $"{user.Username}_profile.jpg"
             };
         }
+        [HttpGet("getPostsByUser/{userId}")]
+        public async Task<IActionResult> GetPostsByUser(Guid userId)
+        {
+            var posts = await _postService.GetPostsByUserIdAsync(userId);
+
+            if (posts == null)
+            {
+                return NotFound($"No posts found for user with ID {userId}");
+            }
+
+            // Return JSON data (including ImageData as base64 string)
+            return Ok(posts);
+        }
+        [HttpGet("getPostImage/{postId}")]
+        public async Task<IActionResult> GetPostImage(Guid postId)
+        {
+            var post = await _postService.GetPostByIdAsync(postId);
+
+            if (post == null || post.ImageData == null || post.ImageData.Length == 0)
+            {
+                return NotFound($"Image for post with ID {postId} not found.");
+            }
+
+            // Return the image as a downloadable file (or displayable image)
+            return new FileContentResult(post.ImageData, "image/jpeg")
+            {
+                FileDownloadName = $"post_{postId}_image.jpg"
+            };
+        }
     }
 }
 

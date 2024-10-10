@@ -38,7 +38,7 @@ namespace PostIt.Application.Services
             var post = new Posts
             {
                 UserId = postDto.UserId,
-                ImageData = imageData,  
+                ImageData = postDto.ImageData,  
                 Caption = postDto.Caption,
                 Comments = postDto.Comments,
                 LikeCount = postDto.LikeCount,
@@ -64,6 +64,25 @@ namespace PostIt.Application.Services
             };
 
             return postDto;
+        }
+
+        public async Task<List<PostDto>> GetPostsByUserIdAsync(Guid id)
+        {
+            var posts = await _postsRepository.GetPostsByUserIdAsync(id); // This will be List<Posts>
+
+            // Convert List<Posts> to List<PostDto>
+            var postDtos = posts.Select(post => new PostDto
+            {
+                Id = post.Id,
+                UserId = post.UserId,
+                Caption = post.Caption,
+                Comments = post.Comments,
+                LikeCount = post.LikeCount,
+                WhoHasLiked = post.WhoHasLiked,
+                
+            }).ToList();
+
+            return postDtos;
         }
     }
 }

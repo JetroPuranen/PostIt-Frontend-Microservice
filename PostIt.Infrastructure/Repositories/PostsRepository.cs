@@ -38,5 +38,17 @@ namespace PostIt.Infrastructure.Repositories
 
             return post;
         }
+        public async Task<List<Posts>> GetPostsByUserIdAsync(Guid id)
+        {
+            var response = await _httpClient.GetAsync(_dbUrl + "getPostsByUser/" + id);
+            response.EnsureSuccessStatusCode();
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+
+            // Deserialize into a list of posts
+            var posts = JsonConvert.DeserializeObject<List<Posts>>(jsonResponse);
+
+            return posts;
+        }
     }
 }
