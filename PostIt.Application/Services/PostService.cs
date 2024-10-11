@@ -17,14 +17,14 @@ namespace PostIt.Application.Services
 
         public async Task AddPostAsync(AddPostDto postDto, IFormFile image)
         {
-            byte[] imageData = null; // Store image as byte array
+            byte[] imageData = null; 
 
             if (image != null)
             {
                 using (var memoryStream = new MemoryStream())
                 {
                     await image.CopyToAsync(memoryStream);
-                    imageData = memoryStream.ToArray();  // Convert image to byte array
+                    imageData = memoryStream.ToArray();  
                 }
             }
             else
@@ -32,12 +32,12 @@ namespace PostIt.Application.Services
                 _logger.LogWarning("Image not provided");
             }
 
-            // Create a new post object and set its properties
+            
             var post = new Posts
             {
                 UserId = postDto.UserId,
                 Caption = postDto.Caption,
-                ImageData = imageData // Set image data as byte array
+                ImageData = imageData 
             };
 
             // Call repository to save the post
@@ -65,9 +65,9 @@ namespace PostIt.Application.Services
 
         public async Task<List<PostDto>> GetPostsByUserIdAsync(Guid id)
         {
-            var posts = await _postsRepository.GetPostsByUserIdAsync(id); // This will be List<Posts>
+            var posts = await _postsRepository.GetPostsByUserIdAsync(id); 
 
-            // Convert List<Posts> to List<PostDto>
+            
             var postDtos = posts.Select(post => new PostDto
             {
                 Id = post.Id,
