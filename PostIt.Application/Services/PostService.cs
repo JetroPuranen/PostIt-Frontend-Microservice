@@ -15,38 +15,35 @@ namespace PostIt.Application.Services
             _postsRepository = postRepository;
         }
 
-        public async Task AddPostAsync(PostDto postDto, IFormFile image)
+        public async Task AddPostAsync(AddPostDto postDto, IFormFile image)
         {
-            string imageData = null;
+            byte[] imageData = null; // Store image as byte array
 
             if (image != null)
             {
                 using (var memoryStream = new MemoryStream())
                 {
                     await image.CopyToAsync(memoryStream);
-                    byte[] fileBytes = memoryStream.ToArray();
-                    imageData = Convert.ToBase64String(fileBytes);
+                    imageData = memoryStream.ToArray();  // Convert image to byte array
                 }
             }
             else
             {
-                _logger.LogWarning("Image not given");
+                _logger.LogWarning("Image not provided");
             }
 
-
-
+            // Create a new post object and set its properties
             var post = new Posts
             {
                 UserId = postDto.UserId,
-                ImageData = postDto.ImageData,  
                 Caption = postDto.Caption,
-                Comments = postDto.Comments,
-                LikeCount = postDto.LikeCount,
-                WhoHasLiked = postDto.WhoHasLiked
+                ImageData = imageData // Set image data as byte array
             };
 
+            // Call repository to save the post
             await _postsRepository.AddAsync(post);
         }
+
 
         public async Task<PostDto> GetPostByIdAsync(Guid id)
         {

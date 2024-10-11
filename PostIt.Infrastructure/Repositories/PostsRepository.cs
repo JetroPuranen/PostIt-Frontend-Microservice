@@ -21,7 +21,7 @@ namespace PostIt.Infrastructure.Repositories
             var jsonData = JsonConvert.SerializeObject(post);
             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync(_dbUrl + "addPost", content);
+            var response = await _httpClient.PostAsync(_dbUrl + "addPost/", content);
             
         }
 
