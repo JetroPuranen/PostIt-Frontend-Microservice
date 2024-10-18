@@ -113,7 +113,7 @@ namespace PostIt.FrontEndMicroService.Controllers
             return StatusCode(500, "An error occurred while unfollowing the user.");
         }
         [HttpPost("addPost")]
-        public async Task<IActionResult> AddPost([FromForm] PostDto postDto, IFormFile postPicture)
+        public async Task<IActionResult> AddPost([FromForm] AddPostDto postDto, IFormFile postPicture)
         {
             if (postDto == null)
             {
