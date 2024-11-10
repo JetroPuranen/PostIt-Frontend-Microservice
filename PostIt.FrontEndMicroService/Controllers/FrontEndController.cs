@@ -165,7 +165,10 @@ namespace PostIt.FrontEndMicroService.Controllers
                 user.EmailAddress,
                 user.HomeAddress,
                 user.BirthDay,
-                ProfilePictureUrl = profilePictureUrl // Include the picture URL
+                Followers = user.Followers,
+                Following = user.Following,
+                ProfilePictureUrl = profilePictureUrl,
+                
             });
         }
 
