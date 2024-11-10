@@ -76,13 +76,18 @@ namespace PostIt.Application.Services
         {
             var user = await _userRepository.GetUserById(id);
 
+            if (user == null)
+            {
+                return null;
+            }
+
             byte[]? profilePictureBytes = null;
             if (!string.IsNullOrEmpty(user.ProfilePicture))
             {
                 profilePictureBytes = Convert.FromBase64String(user.ProfilePicture);
             }
 
-            var newUser = new UserDetailDto
+            return new UserDetailDto
             {
                 UserId = user.UserId,
                 Username = user.Username,
@@ -91,10 +96,18 @@ namespace PostIt.Application.Services
                 EmailAddress = user.EmailAddress,
                 HomeAddress = user.HomeAddress,
                 BirthDay = user.BirthDay,
-                ProfilePictureBytes = profilePictureBytes // Send image as byte array
+                ProfilePictureBytes = profilePictureBytes,
+                Followers = user.Followers.Select(f => new SimpleUserDto
+                {
+                    UserId = f.UserId.ToString(),
+                    Username = f.Username
+                }).ToList(),
+                Following = user.Following.Select(f => new SimpleUserDto
+                {
+                    UserId = f.UserId.ToString(),
+                    Username = f.Username
+                }).ToList()
             };
-
-            return newUser;
         }
     }
 }
