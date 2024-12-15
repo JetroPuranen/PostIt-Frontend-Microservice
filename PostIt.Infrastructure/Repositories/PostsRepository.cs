@@ -29,9 +29,11 @@ namespace PostIt.Infrastructure.Repositories
         {
             var response = await _httpClient.GetAsync(_dbUrl + "getPost/" + id);
 
-            // Ensure the response is successful
-            response.EnsureSuccessStatusCode();
-
+            if(response == null)
+            {
+                return null;
+            }
+            
             // Read and deserialize the response content
             var jsonResponse = await response.Content.ReadAsStringAsync();
             var post = JsonConvert.DeserializeObject<Posts>(jsonResponse);
@@ -41,14 +43,30 @@ namespace PostIt.Infrastructure.Repositories
         public async Task<List<Posts>> GetPostsByUserIdAsync(Guid id)
         {
             var response = await _httpClient.GetAsync(_dbUrl + "getPostsByUser/" + id);
-            response.EnsureSuccessStatusCode();
+
+            if (response == null || !response.IsSuccessStatusCode)
+            {
+                return new List<Posts>();
+            }
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            // Deserialize into a list of posts
-            var posts = JsonConvert.DeserializeObject<List<Posts>>(jsonResponse);
+            // Check if the response is empty or invalid JSON
+            if (string.IsNullOrWhiteSpace(jsonResponse) || jsonResponse == "NaN")
+            {
+                return new List<Posts>();
+            }
 
-            return posts;
+            try
+            {
+                // Deserialize into a list of posts
+                var posts = JsonConvert.DeserializeObject<List<Posts>>(jsonResponse);
+                return posts ?? new List<Posts>();
+            }
+            catch (JsonReaderException)
+            {
+                return new List<Posts>(); // Return an empty list on deserialization error
+            }
         }
     }
 }

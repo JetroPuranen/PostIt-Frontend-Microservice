@@ -2,7 +2,7 @@
 {
     public class UnfollowDto
     {
-        public string? Username { get; set; }  //user who wants to unfollow
-        public string? UnfollowUsername { get; set; }  //user to be unfollowed
+        public string? UserId { get; set; }  //user who wants to unfollow
+        public string? UnfollowUserId { get; set; }  //user to be unfollowed
     }
 }

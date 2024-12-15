@@ -77,7 +77,7 @@ namespace PostIt.FrontEndMicroService.Controllers
         }
 
         [HttpPost("addFollower")]
-        [Authorize]
+        
         public async Task<IActionResult> AddFollower([FromForm] FollowerDto followerDto)
         {
             if (followerDto == null)
@@ -96,7 +96,7 @@ namespace PostIt.FrontEndMicroService.Controllers
         }
 
         [HttpPost("unfollowUser")]
-        [Authorize]
+        
         public async Task<IActionResult> UnfollowUser([FromForm] UnfollowDto unfollowDto)
         {
             if (unfollowDto == null)
