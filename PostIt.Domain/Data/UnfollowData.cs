@@ -2,7 +2,7 @@
 {
     public class UnfollowData
     {
-        public string Username { get; set; }
-        public string UnfollowUsername { get; set; }
+        public string UserId { get; set; }
+        public string UnfollowUserId { get; set; }
     }
 }

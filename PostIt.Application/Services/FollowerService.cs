@@ -16,16 +16,10 @@ namespace PostIt.Application.Services
 
         public async Task<bool> AddFollowerAsync(FollowerDto followerDto)
         {
-            if (string.IsNullOrEmpty(followerDto.Username) || string.IsNullOrEmpty(followerDto.FollowerUsername))
-            {
-                throw new ArgumentException("Invalid follower data.");
-            }
-
-            
             var followerData = new FollowerData
             {
-                Username = followerDto.Username,
-                FollowerUsername = followerDto.FollowerUsername
+                UserId = followerDto.UserId,
+                FollowerUserId = followerDto.FollowerUserId
             };
 
             

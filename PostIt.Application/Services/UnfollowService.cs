@@ -16,15 +16,12 @@ namespace PostIt.Application.Services
 
         public async Task<bool> RemoveFollowerAsync(UnfollowDto unfollowDto)
         {
-            if (string.IsNullOrEmpty(unfollowDto.Username) || string.IsNullOrEmpty(unfollowDto.UnfollowUsername))
-            {
-                throw new ArgumentException("Invalid unfollow data.");
-            }
-
+            
             var unfollowData = new UnfollowData
             {
-                UnfollowUsername = unfollowDto.Username,
-                Username = unfollowDto.Username,
+                UserId = unfollowDto.UserId,
+                UnfollowUserId = unfollowDto.UnfollowUserId
+                
             };
 
             return await _userRepository.RemoveFollowerFromDatabase(unfollowData);

@@ -66,7 +66,10 @@ namespace PostIt.Infrastructure.Repositories
         {
             var response = await _httpClient.GetAsync(_dbUrl + "getUser/" + id);
 
-            response.EnsureSuccessStatusCode();
+            if(response == null)
+            {
+                return null;
+            }
 
             // Read and deserialize the response content
             var jsonResponse = await response.Content.ReadAsStringAsync();
