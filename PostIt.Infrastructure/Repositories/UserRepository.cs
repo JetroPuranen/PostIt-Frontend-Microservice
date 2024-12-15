@@ -23,7 +23,7 @@ namespace PostIt.Infrastructure.Repositories
             var jsonData = JsonConvert.SerializeObject(user);
             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync(_dbUrl, content); 
+            var response = await _httpClient.PostAsync(_dbUrl + "addUser", content); 
             return response.IsSuccessStatusCode;
         }
         public async Task<string> LoginUserInDatabase(LoginData loginData)
@@ -60,6 +60,22 @@ namespace PostIt.Infrastructure.Repositories
             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync($"{_dbUrl}unfollowUser", content);
             return response.IsSuccessStatusCode;
+        }
+
+        public async Task<Users> GetUserById(Guid id)
+        {
+            var response = await _httpClient.GetAsync(_dbUrl + "getUser/" + id);
+
+            if(response == null)
+            {
+                return null;
+            }
+
+            // Read and deserialize the response content
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var user = JsonConvert.DeserializeObject<Users>(jsonResponse);
+
+            return user;
         }
     }
     

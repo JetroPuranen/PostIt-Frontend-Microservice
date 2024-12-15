@@ -77,7 +77,7 @@ namespace PostIt.FrontEndMicroService.Controllers
         }
 
         [HttpPost("addFollower")]
-        [Authorize]
+        
         public async Task<IActionResult> AddFollower([FromForm] FollowerDto followerDto)
         {
             if (followerDto == null)
@@ -96,7 +96,7 @@ namespace PostIt.FrontEndMicroService.Controllers
         }
 
         [HttpPost("unfollowUser")]
-        [Authorize]
+        
         public async Task<IActionResult> UnfollowUser([FromForm] UnfollowDto unfollowDto)
         {
             if (unfollowDto == null)
@@ -113,7 +113,7 @@ namespace PostIt.FrontEndMicroService.Controllers
             return StatusCode(500, "An error occurred while unfollowing the user.");
         }
         [HttpPost("addPost")]
-        public async Task<IActionResult> AddPost([FromForm] PostDto postDto, IFormFile postPicture)
+        public async Task<IActionResult> AddPost([FromForm] AddPostDto postDto, IFormFile postPicture)
         {
             if (postDto == null)
             {
@@ -122,6 +122,99 @@ namespace PostIt.FrontEndMicroService.Controllers
 
             await _postService.AddPostAsync(postDto, postPicture);
             return Ok("Post created successfully.");
+        }
+        [HttpGet("getpost/{id}")]
+        public async Task<IActionResult> GetPostById(Guid id)
+        {
+            if(id == null)
+            {
+                return BadRequest("Id is null");
+            }
+            var post = await _postService.GetPostByIdAsync(id);
+            return Ok(post);
+        }
+        [HttpGet("getUser/{id}")]
+        public async Task<IActionResult> GetUserById(Guid id)
+        {
+            if (id == null)
+            {
+                return BadRequest("Id is null");
+            }
+
+            var user = await _userService.GetUserById(id);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Check if the profile picture exists
+            string profilePictureUrl = null;
+            if (user.ProfilePictureBytes != null)
+            {
+                // Convert the profile picture to a downloadable file URL (assuming this endpoint serves it)
+                profilePictureUrl = Url.Action(nameof(DownloadProfilePicture), new { id = id });
+            }
+
+            // Return JSON data along with the picture URL
+            return Ok(new
+            {
+                user.UserId,
+                user.Username,
+                user.FirstName,
+                user.SurName,
+                user.EmailAddress,
+                user.HomeAddress,
+                user.BirthDay,
+                Followers = user.Followers,
+                Following = user.Following,
+                ProfilePictureUrl = profilePictureUrl,
+                
+            });
+        }
+
+        [HttpGet("downloadProfilePicture/{id}")]
+        public async Task<IActionResult> DownloadProfilePicture(Guid id)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null || user.ProfilePictureBytes == null)
+            {
+                return NotFound("User or profile picture not found");
+            }
+
+            // Return the profile picture as a file download
+            return new FileContentResult(user.ProfilePictureBytes, "image/jpeg")
+            {
+                FileDownloadName = $"{user.Username}_profile.jpg"
+            };
+        }
+        [HttpGet("getPostsByUser/{userId}")]
+        public async Task<IActionResult> GetPostsByUser(Guid userId)
+        {
+            var posts = await _postService.GetPostsByUserIdAsync(userId);
+
+            if (posts == null)
+            {
+                return NotFound($"No posts found for user with ID {userId}");
+            }
+
+            // Return JSON data (including ImageData as base64 string)
+            return Ok(posts);
+        }
+        [HttpGet("getPostImage/{postId}")]
+        public async Task<IActionResult> GetPostImage(Guid postId)
+        {
+            var post = await _postService.GetPostByIdAsync(postId);
+
+            if (post == null || post.ImageData == null || post.ImageData.Length == 0)
+            {
+                return NotFound($"Image for post with ID {postId} not found.");
+            }
+
+            // Return the image as a downloadable file (or displayable image)
+            return new FileContentResult(post.ImageData, "image/jpeg")
+            {
+                FileDownloadName = $"post_{postId}_image.jpg"
+            };
         }
     }
 }

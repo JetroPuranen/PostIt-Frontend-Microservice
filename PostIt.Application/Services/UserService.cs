@@ -71,5 +71,43 @@ namespace PostIt.Application.Services
 
             return await _userRepository.AddUserToDatabase(userEntity);
         }
+
+        public async Task<UserDetailDto?> GetUserById(Guid id)
+        {
+            var user = await _userRepository.GetUserById(id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            byte[]? profilePictureBytes = null;
+            if (!string.IsNullOrEmpty(user.ProfilePicture))
+            {
+                profilePictureBytes = Convert.FromBase64String(user.ProfilePicture);
+            }
+
+            return new UserDetailDto
+            {
+                UserId = user.UserId,
+                Username = user.Username,
+                FirstName = user.FirstName,
+                SurName = user.SurName,
+                EmailAddress = user.EmailAddress,
+                HomeAddress = user.HomeAddress,
+                BirthDay = user.BirthDay,
+                ProfilePictureBytes = profilePictureBytes,
+                Followers = user.Followers.Select(f => new SimpleUserDto
+                {
+                    UserId = f.UserId.ToString(),
+                    Username = f.Username
+                }).ToList(),
+                Following = user.Following.Select(f => new SimpleUserDto
+                {
+                    UserId = f.UserId.ToString(),
+                    Username = f.Username
+                }).ToList()
+            };
+        }
     }
 }

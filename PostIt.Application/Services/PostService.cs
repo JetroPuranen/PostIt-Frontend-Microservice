@@ -15,37 +15,71 @@ namespace PostIt.Application.Services
             _postsRepository = postRepository;
         }
 
-        public async Task AddPostAsync(PostDto postDto, IFormFile image)
+        public async Task AddPostAsync(AddPostDto postDto, IFormFile image)
         {
-            string imageData = null;
+            byte[] imageData = null; 
 
             if (image != null)
             {
                 using (var memoryStream = new MemoryStream())
                 {
                     await image.CopyToAsync(memoryStream);
-                    byte[] fileBytes = memoryStream.ToArray();
-                    imageData = Convert.ToBase64String(fileBytes);
+                    imageData = memoryStream.ToArray();  
                 }
             }
             else
             {
-                _logger.LogWarning("Image not given");
+                _logger.LogWarning("Image not provided");
             }
 
-
-
+            
             var post = new Posts
             {
                 UserId = postDto.UserId,
-                ImageData = imageData,  
                 Caption = postDto.Caption,
-                Comments = postDto.Comments,
-                LikeCount = postDto.LikeCount,
-                WhoHasLiked = postDto.WhoHasLiked
+                ImageData = imageData 
             };
 
+            // Call repository to save the post
             await _postsRepository.AddAsync(post);
+        }
+
+
+        public async Task<PostDto> GetPostByIdAsync(Guid id)
+        {
+            var post = await _postsRepository.GetAsync(id);
+
+            
+            var postDto = new PostDto
+            {
+                
+                Caption = post.Caption,
+                Comments = post.Comments,
+                LikeCount = post.LikeCount,
+                WhoHasLiked = post.WhoHasLiked,
+                ImageData = post.ImageData,
+            };
+
+            return postDto;
+        }
+
+        public async Task<List<PostDto>> GetPostsByUserIdAsync(Guid id)
+        {
+            var posts = await _postsRepository.GetPostsByUserIdAsync(id); 
+
+            
+            var postDtos = posts.Select(post => new PostDto
+            {
+                Id = post.Id,
+                UserId = post.UserId,
+                Caption = post.Caption,
+                Comments = post.Comments,
+                LikeCount = post.LikeCount,
+                WhoHasLiked = post.WhoHasLiked,
+                
+            }).ToList();
+
+            return postDtos;
         }
     }
 }

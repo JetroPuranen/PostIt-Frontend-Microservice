@@ -8,6 +8,7 @@ namespace PostIt.Application.Interfaces
     {
         (bool IsValid, string Message) ValidateUser(CreateUserDto userDto);
         Task<bool> AddUserAsync(CreateUserDto userDto, IFormFile profilepicture);
+        Task<UserDetailDto?>GetUserById(Guid id);
 
         
     }

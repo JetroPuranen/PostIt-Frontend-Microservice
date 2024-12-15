@@ -8,6 +8,7 @@ namespace PostIt.Domain.Interfaces
         Task<string> LoginUserInDatabase(LoginData logindata);
         Task<bool> AddFollowerToDatabase(FollowerData followerDto);
         Task<bool> RemoveFollowerFromDatabase(UnfollowData unfollowDto);
+        Task<Users> GetUserById(Guid id);
     }
 
 }
