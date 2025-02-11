@@ -216,6 +216,22 @@ namespace PostIt.FrontEndMicroService.Controllers
                 FileDownloadName = $"post_{postId}_image.jpg"
             };
         }
+        [HttpPut("updatePost")]
+        public async Task<IActionResult> UpdatePost([FromBody] UpdatePostDto updatePostDto)
+        {
+            if (updatePostDto == null || updatePostDto.Id == Guid.Empty)
+            {
+                return BadRequest("Invalid request data");
+            }
+
+            var result = await _postService.UpdatePostAsync(updatePostDto);
+            if (!result)
+            {
+                return NotFound("Post not found or update failed");
+            }
+
+            return Ok("Post updated successfully");
+        }
     }
 }
 

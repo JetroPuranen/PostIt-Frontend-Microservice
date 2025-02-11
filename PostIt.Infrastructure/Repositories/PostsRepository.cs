@@ -68,5 +68,14 @@ namespace PostIt.Infrastructure.Repositories
                 return new List<Posts>(); // Return an empty list on deserialization error
             }
         }
+        public async Task<bool> UpdateAsync(UpdatePost updatePostDto)
+        {
+            var jsonData = JsonConvert.SerializeObject(updatePostDto, Formatting.Indented);
+
+            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"{_dbUrl}updatePost/", content);
+
+            return response.IsSuccessStatusCode;
+        }
     }
 }
